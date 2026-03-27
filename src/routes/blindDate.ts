@@ -127,3 +127,15 @@ blindDateRouter.get("/status/:phone", async (req, res) => {
     name: signup.name,
   });
 });
+
+// ---------------------------------------------------------------------------
+// GET /admin/signups — all signups for admin dashboard
+// ---------------------------------------------------------------------------
+
+blindDateRouter.get("/admin/signups", async (_req, res) => {
+  const signups = await prisma.blindDateSignup.findMany({
+    orderBy: { created_at: "desc" },
+    take: 500,
+  });
+  return res.json({ ok: true, signups });
+});

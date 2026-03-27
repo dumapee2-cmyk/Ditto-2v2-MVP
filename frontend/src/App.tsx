@@ -6,6 +6,8 @@ import { AgentPage } from "./pages/AgentPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { BlindDatePage } from "./pages/BlindDatePage";
 import { SignupPage } from "./pages/SignupPage";
+import { FormPage } from "./pages/FormPage";
+import { AdminPage } from "./pages/AdminPage";
 import "./index.css";
 
 export default function App() {
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/agent/:id" element={<AgentPage />} />
         <Route path="/blind-date" element={<BlindDatePage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/form" element={<FormPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
