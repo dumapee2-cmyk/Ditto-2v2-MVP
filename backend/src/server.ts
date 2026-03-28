@@ -16,6 +16,7 @@ import icloudAuthRouter from "./routes/icloudAuth.js";
 import shortcutSyncRouter from "./routes/shortcutSync.js";
 import setupRouter from "./routes/setup.js";
 import { blindDateRouter } from "./routes/blindDate.js";
+import { bublRouter } from "./routes/bublProfiles.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
@@ -39,6 +40,7 @@ app.use("/api/icloud", icloudAuthRouter);
 app.use("/api/sync", shortcutSyncRouter);
 app.use("/setup", setupRouter);
 app.use("/api/blind-date", blindDateRouter);
+app.use("/api/bubl", bublRouter);
 
 // Serve frontend static files
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -48,9 +50,9 @@ app.use(express.static(publicDir));
 app.get("/health", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    return res.json({ ok: true, service: "bit7-api", db: "connected" });
+    return res.json({ ok: true, service: "bubl-api", db: "connected" });
   } catch {
-    return res.status(503).json({ ok: false, service: "bit7-api", db: "disconnected" });
+    return res.status(503).json({ ok: false, service: "bubl-api", db: "disconnected" });
   }
 });
 
@@ -60,21 +62,12 @@ app.get("*", (_req, res) => {
 });
 
 app.listen(port, async () => {
-  console.log(`Bit7 Agent API running on http://localhost:${port}`);
+  console.log(`Bubl API running on http://localhost:${port}`);
 
-  // Start iMessage runtime + scheduler if configured
-  if (process.env.IMESSAGE_AGENT_ID) {
-    try {
-      const { startIMessageRuntime } = await import("./lib/imessage/imessageRuntime.js");
-      await startIMessageRuntime();
-
-      // Start the scheduler for proactive jobs + live activity subscriptions
-      const { startScheduler } = await import("./lib/imessage/scheduler.js");
-      await startScheduler();
-      console.log("[Scheduler] Proactive intelligence and live tracking active");
-    } catch (e) {
-      console.warn("[iMessage] Failed to start iMessage runtime:", e instanceof Error ? e.message : e);
-      console.warn("[iMessage] This is expected on non-macOS systems or without Full Disk Access");
-    }
+  try {
+    const { startBublAgent } = await import("./bublAgent.js");
+    await startBublAgent();
+  } catch (e) {
+    console.warn("[Bubl] Failed to start agent:", e instanceof Error ? e.message : e);
   }
 });

@@ -33,7 +33,7 @@ function normalizePhone(raw: string): string | null {
 
 blindDateRouter.post("/signup", upload.single("school_id"), async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, gender, looking_for, hobbies } = req.body;
     const file = req.file;
 
     if (!name || !phone || !file) {
@@ -60,11 +60,17 @@ blindDateRouter.post("/signup", upload.single("school_id"), async (req, res) => 
     // Store school ID as base64 data URL
     const base64 = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 
+    let parsedHobbies: string[] = [];
+    try { parsedHobbies = hobbies ? JSON.parse(hobbies) : []; } catch { /* ignore */ }
+
     const signup = await prisma.blindDateSignup.create({
       data: {
         name: name.trim(),
         phone: normalized,
         school_id_url: base64,
+        gender: gender || null,
+        looking_for: looking_for || null,
+        hobbies: parsedHobbies,
       },
     });
 
@@ -120,4 +126,25 @@ blindDateRouter.get("/status/:phone", async (req, res) => {
     status: signup.status,
     name: signup.name,
   });
+});
+
+// ---------------------------------------------------------------------------
+// GET /admin/signups — all signups for admin dashboard
+// ---------------------------------------------------------------------------
+
+blindDateRouter.get("/admin/signups", async (_req, res) => {
+  const signups = await prisma.blindDateSignup.findMany({
+    orderBy: { created_at: "desc" },
+    take: 500,
+  });
+  return res.json({ ok: true, signups });
+});
+
+blindDateRouter.delete("/admin/signups/:id", async (req, res) => {
+  try {
+    await prisma.blindDateSignup.delete({ where: { id: req.params.id } });
+    return res.json({ ok: true });
+  } catch {
+    return res.status(404).json({ ok: false, error: "not found" });
+  }
 });

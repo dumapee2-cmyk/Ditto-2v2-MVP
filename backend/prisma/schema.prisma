@@ -187,6 +187,9 @@ model BlindDateSignup {
   name          String
   phone         String    @unique
   school_id_url String                // base64 or URL of school ID photo
+  gender        String?               // "male" | "female" | "nonbinary"
+  looking_for   String?               // "male" | "female" | "everyone"
+  hobbies       Json      @default("[]") // array of strings
   status        String    @default("waiting") // "waiting" | "matched" | "archived"
   match_id      String?
   created_at    DateTime  @default(now())
@@ -217,4 +220,32 @@ model BlindDateMatch {
   @@index([person_a_phone])
   @@index([person_b_phone])
   @@map("blind_date_matches")
+}
+
+// ---------------------------------------------------------------------------
+// Bubl — User Profiles & Stats
+// ---------------------------------------------------------------------------
+
+model BublProfile {
+  id            String    @id @default(uuid())
+  phone         String    @unique
+  name          String
+  age           Int?
+  gender        String?   // "male" | "female" | "nonbinary" | "other"
+  bio           String?
+  photo_urls    Json      @default("[]") // array of photo URLs
+  interests     Json      @default("[]") // array of strings
+  location      String?   // city, state
+  school        String?
+  looking_for   String?   // "male" | "female" | "everyone"
+  verified      Boolean   @default(false)
+  active        Boolean   @default(true)
+  stats         Json      @default("{}") // { matches: 0, likes: 0, weeks_active: 0 }
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@index([location])
+  @@index([gender])
+  @@index([active])
+  @@map("bubl_profiles")
 }
