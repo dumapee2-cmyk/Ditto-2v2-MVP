@@ -287,7 +287,7 @@ function PhoneMockup() {
     { dir: "in" as const, text: "are you ready to find out who you got?" },
     { dir: "out" as const, text: "omg YES" },
     { dir: "in" as const, text: "you're locked in 🔒 waiting on your match..." },
-    { dir: "in" as const, text: "your match is... Jake! 🎉\n\ntheir number: (949) 555-0123\n\nsay hi 👋" },
+    { dir: "in" as const, text: "your match is... Bella! 🎉\n\ntheir number: (949) 555-0123\n\nsay hi 👋" },
   ];
   return (
     <div className="w-[250px] sm:w-[280px] lg:w-[320px] shrink-0">
