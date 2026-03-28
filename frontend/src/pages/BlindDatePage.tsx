@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { motion, type Variants } from "motion/react";
 
 /* ─── Scrapbook paper styles ─── */
@@ -353,19 +353,11 @@ type FormState = "idle" | "submitting" | "success";
 export function BlindDatePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
   const [formState, setFormState] = useState<FormState>("idle");
   const [error, setError] = useState("");
   const [position, setPosition] = useState(0);
-  const fileRef = useRef<HTMLInputElement>(null);
   const signupRef = useRef<HTMLDivElement>(null);
-
-  const handlePhoto = (f: File | null) => {
-    setPhoto(f);
-    if (f) { const r = new FileReader(); r.onload = (e) => setPhotoPreview(e.target?.result as string); r.readAsDataURL(f); }
-    else setPhotoPreview(null);
-  };
   const fmt = (v: string) => {
     const d = v.replace(/\D/g, "").slice(0, 10);
     if (d.length <= 3) return d;
@@ -374,12 +366,12 @@ export function BlindDatePage() {
   };
   const submit = async () => {
     setError("");
-    if (!name.trim() || !phone.trim() || !photo) { setError("all fields are required"); return; }
+    if (!name.trim() || !phone.trim() || !email.trim()) { setError("all fields are required"); return; }
     setFormState("submitting");
     const fd = new FormData();
     fd.append("name", name.trim());
     fd.append("phone", phone.replace(/\D/g, ""));
-    fd.append("school_id", photo);
+    fd.append("email", email.trim());
     try {
       const res = await fetch("/api/blind-date/signup", { method: "POST", body: fd });
       const data = await res.json();
@@ -591,20 +583,9 @@ export function BlindDatePage() {
                   <p className="text-[11px] text-white/15 mt-1 ml-1">iMessage required</p>
                 </div>
                 <div>
-                  <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={(e) => handlePhoto(e.target.files?.[0] ?? null)} className="hidden" />
-                  {photoPreview ? (
-                    <div className="relative w-full h-32 rounded-lg overflow-hidden border border-white/10 cursor-pointer group" onClick={() => fileRef.current?.click()}>
-                      <img src={photoPreview} alt="School ID" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                        <p className="text-white text-[13px]">change</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <button onClick={() => fileRef.current?.click()} className="w-full h-24 rounded-lg border border-dashed border-white/10 hover:border-white/25 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer">
-                      <Camera className="w-4 h-4 text-white/20" />
-                      <span className="text-[13px] text-white/25">school ID</span>
-                    </button>
-                  )}
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="student email"
+                    className="w-full px-4 py-3 rounded-lg border border-white/10 text-[15px] text-white placeholder:text-white/20 focus:outline-none focus:border-white/25 transition bg-white/5" />
+                  <p className="text-[11px] text-white/15 mt-1 ml-1">.edu email preferred</p>
                 </div>
 
                 {error && <p className="text-[13px] text-red-400 text-center">{error}</p>}
