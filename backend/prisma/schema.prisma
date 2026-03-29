@@ -249,3 +249,38 @@ model BublProfile {
   @@index([active])
   @@map("bubl_profiles")
 }
+
+// ---------------------------------------------------------------------------
+// Party — Double Date Lobby System
+// ---------------------------------------------------------------------------
+
+model Party {
+  id         String      @id @default(uuid())
+  code       String      @unique
+  status     String      @default("waiting") // "waiting" | "full" | "matched"
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+
+  slots      PartySlot[]
+
+  @@index([code])
+  @@index([status])
+  @@map("parties")
+}
+
+model PartySlot {
+  id       String  @id @default(uuid())
+  party_id String
+  role     String  // "guy" | "girl"
+  is_host  Boolean @default(false)
+  name     String?
+  phone    String?
+  filled   Boolean @default(false)
+  position Int     // 0-3
+
+  party    Party   @relation(fields: [party_id], references: [id], onDelete: Cascade)
+
+  @@unique([party_id, position])
+  @@index([party_id])
+  @@map("party_slots")
+}

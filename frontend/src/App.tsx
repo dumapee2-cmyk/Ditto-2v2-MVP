@@ -8,6 +8,7 @@ import { BlindDatePage } from "./pages/BlindDatePage";
 import { SignupPage } from "./pages/SignupPage";
 import { FormPage } from "./pages/FormPage";
 import { AdminPage } from "./pages/AdminPage";
+import { PartyPage } from "./pages/PartyPage";
 import "./index.css";
 
 export default function App() {
@@ -22,6 +23,8 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/form" element={<FormPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/party" element={<PartyPage />} />
+        <Route path="/party/:code" element={<PartyPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
